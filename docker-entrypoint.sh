@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# Derived, by Sammons, from:
+#
 # Copyright 2017 ThoughtWorks, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -31,9 +33,9 @@ fi
 if [ "$1" = '/go-server/server.sh' ]; then
 
   if [ "$(id -u)" = '0' ]; then
-    export SERVER_WORK_DIR="/go-working-dir"
-    export GO_CONFIG_DIR="/go-working-dir/config"
-    export STDOUT_LOG_FILE="/go-working-dir/logs/go-server.out.log"
+    export SERVER_WORK_DIR="$VOLUME_DIR/go-working-dir"
+    export GO_CONFIG_DIR="$VOLUME_DIR/go-working-dir/config"
+    export STDOUT_LOG_FILE="$VOLUME_DIR/go-working-dir/logs/go-server.out.log"
 
     server_dirs=(artifacts config db logs plugins addons)
 
@@ -41,30 +43,31 @@ if [ "$1" = '/go-server/server.sh' ]; then
 
     # ensure working dir exist
     if [ ! -e "${SERVER_WORK_DIR}" ]; then
-      try mkdir "${SERVER_WORK_DIR}"
+      try mkdir -p -v "${SERVER_WORK_DIR}"
       try chown go:go "${SERVER_WORK_DIR}"
     fi
 
     # ensure proper directory structure in the volume directory
     if [ ! -e "${VOLUME_DIR}" ]; then
-      try mkdir "${VOLUME_DIR}"
+      try mkdir -p -v "${VOLUME_DIR}"
       try chown go:go "${VOLUME_DIR}"
     fi
 
     for each_dir in "${server_dirs[@]}"; do
       if [ ! -e "${VOLUME_DIR}/${each_dir}" ]; then
-        try mkdir -v "${VOLUME_DIR}/${each_dir}"
+        try mkdir -p -v "${VOLUME_DIR}/${each_dir}"
         try chown go:go "${VOLUME_DIR}/${each_dir}"
       fi
 
       if [ ! -e "${SERVER_WORK_DIR}/${each_dir}" ]; then
-        try ln -sv "${VOLUME_DIR}/${each_dir}" "${SERVER_WORK_DIR}/${each_dir}"
+        try mkdir -v -p  "${SERVER_WORK_DIR}/${each_dir}"
+        # try ln -sv "${VOLUME_DIR}/${each_dir}" "${SERVER_WORK_DIR}/${each_dir}"
         try chown go:go "${SERVER_WORK_DIR}/${each_dir}"
       fi
     done
 
     if [ ! -e "${SERVER_WORK_DIR}/config/logback-include.xml" ]; then
-      try cp -rfv "/go-server/config/logback-include.xml" "${SERVER_WORK_DIR}/config/logback-include.xml"
+      try cp "/go-server/config/logback-include.xml" "${SERVER_WORK_DIR}/config/logback-include.xml"
       try chown go:go "${VOLUME_DIR}/config/logback-include.xml"
     fi
 
@@ -84,7 +87,7 @@ if [ "$1" = '/go-server/server.sh' ]; then
       fi
     done
 
-    try exec /sbin/tini -- su-exec go "$0" "$@"
+    try exec-sesu go /go-server/server.sh "$@"
   fi
 fi
 

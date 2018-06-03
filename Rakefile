@@ -8,10 +8,11 @@ def get_var(name)
   end
 end
 
-gocd_version = get_var('GOCD_VERSION')
-download_url = get_var('GOCD_SERVER_DOWNLOAD_URL')
-gocd_full_version = get_var('GOCD_FULL_VERSION')
-gocd_git_sha = get_var('GOCD_GIT_SHA')
+gocd_version = "18.5.0" #get_var('GOCD_VERSION')
+download_url =  "https://download.gocd.org/binaries/18.5.0-6679/generic/go-server-18.5.0-6679.zip" #get_var('GOCD_SERVER_DOWNLOAD_URL')
+gocd_full_version = "0.18.5.0-6679" # get_var('GOCD_FULL_VERSION')
+gocd_git_sha = "a54c3fd44ef9ccbab1b0d856a8d735929eab97f7" #get_var('GOCD_GIT_SHA')
+org = "sammons"
 
 tag = ENV['TAG']
 
@@ -54,16 +55,13 @@ task :git_push do
 end
 
 task :docker_push_experimental => :build_image do
-  org = ENV['EXP_ORG'] || 'gocdexperimental'
   sh("docker tag gocd-server:v#{gocd_version} #{org}/gocd-server:v#{gocd_full_version}")
   sh("docker push #{org}/gocd-server:v#{gocd_full_version}")
 end
 
 task :docker_push_stable do
-  org = ENV['ORG'] || 'gocd'
-  experimental_org = ENV['EXP_ORG'] || 'gocdexperimental'
-  sh("docker pull #{experimental_org}/gocd-server:v#{gocd_full_version}")
-  sh("docker tag #{experimental_org}/gocd-server:v#{gocd_full_version} #{org}/gocd-server:v#{gocd_version}")
+  sh("docker pull #{org}/gocd-server:v#{gocd_full_version}")
+  sh("docker tag #{org}/gocd-server:v#{gocd_full_version} #{org}/gocd-server:v#{gocd_version}")
   sh("docker push #{org}/gocd-server:v#{gocd_version}")
 end
 

@@ -4,7 +4,7 @@ yell() { echo "$0: $*" >&2; }
 die() { yell "$*"; exit 111; }
 try() { echo "$ $@" 1>&2; "$@" || die "cannot $*"; }
 
-GOCD_PLUGIN_EXTERNAL_HOME="/godata/plugins/external"
+GOCD_PLUGIN_EXTERNAL_HOME="/godata/go-working-dir/plugins/external"
 
 if [ ! -e "${GOCD_PLUGIN_EXTERNAL_HOME}" ]; then
   try mkdir -p "${GOCD_PLUGIN_EXTERNAL_HOME}"
@@ -25,6 +25,6 @@ fi
       try rm "${plugin_dest}"
     fi
     try curl --silent --location --fail --retry 3 "${plugin_url}" --output "${plugin_dest}"
-    try chown go:go "${plugin_dest}"
+   try chown go:go "${plugin_dest}"
   fi
 done) < <(env)
