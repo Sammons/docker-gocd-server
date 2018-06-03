@@ -33,9 +33,9 @@ fi
 if [ "$1" = '/go-server/server.sh' ]; then
 
   if [ "$(id -u)" = '0' ]; then
-    export SERVER_WORK_DIR="$VOLUME_DIR/go-working-dir"
-    export GO_CONFIG_DIR="$VOLUME_DIR/go-working-dir/config"
-    export STDOUT_LOG_FILE="$VOLUME_DIR/go-working-dir/logs/go-server.out.log"
+    export SERVER_WORK_DIR="$VOLUME_DIR"
+    export GO_CONFIG_DIR="$VOLUME_DIR/config"
+    export STDOUT_LOG_FILE="$VOLUME_DIR/logs/go-server.out.log"
 
     server_dirs=(artifacts config db logs plugins addons)
 
@@ -73,6 +73,10 @@ if [ "$1" = '/go-server/server.sh' ]; then
 
     try install-gocd-plugins
     try git-clone-config
+    yell "Wiping unnecesssary bundled plugins ..."
+    
+    rm -f /godata/plugins/bundled/gocd-ldap-authentication-plugin.jar;
+#    rm -f /godata/plugins/gocd-filebased-authentication-plugin.jar;
 
     yell "Running custom scripts in /docker-entrypoint.d/ ..."
 

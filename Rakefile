@@ -34,7 +34,7 @@ end
 
 task :build_docker_image do
   tag_name = tag || "v#{gocd_version}"
-  sh("docker build . -t gocd-server:#{tag_name}")
+  sh("docker build . -t #{org}/gocd-server:#{tag_name}")
 end
 
 task :commit_dockerfile do
@@ -60,8 +60,8 @@ task :docker_push_experimental => :build_image do
 end
 
 task :docker_push_stable do
-  sh("docker pull #{org}/gocd-server:v#{gocd_full_version}")
-  sh("docker tag #{org}/gocd-server:v#{gocd_full_version} #{org}/gocd-server:v#{gocd_version}")
+#  sh("docker pull #{org}/gocd-server:v#{gocd_full_version}")
+#  sh("docker tag #{org}/gocd-server:v#{gocd_full_version} #{org}/gocd-server:v#{gocd_version}")
   sh("docker push #{org}/gocd-server:v#{gocd_version}")
 end
 
